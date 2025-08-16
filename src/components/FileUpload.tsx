@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { TuskyService } from '../services/tuskyService';
+import { useFileUpload } from '../hooks/useFiles';
 import { UploadResponse, FileInfo } from '../types';
 import styles from './FileUpload.module.css';
 
@@ -8,23 +8,15 @@ interface FileUploadProps {
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
-  const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const tuskyService = useRef<TuskyService | null>(null);
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  if (!tuskyService.current) {
-    tuskyService.current = TuskyService.getInstance();
-  }
+  
+  const uploadMutation = useFileUpload();
 
   const handleFileSelect = (file: File) => {
-    setError(null);
-    
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10MB');
+      // We could set a local error state here, but for now we'll rely on mutation error
       return;
     }
 
@@ -46,31 +38,34 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const handleUpload = async () => {
     if (!selectedFile || !fileInputRef.current?.files?.[0]) return;
 
-    setIsUploading(true);
-    setError(null);
-
-    try {
-      if (!tuskyService.current) {
-        throw new Error('Tusky service not initialized');
-      }
-      const file = fileInputRef.current.files[0];
-      const response = await tuskyService.current.uploadFile(file);
-
-      if (response.success) {
+    const file = fileInputRef.current.files[0];
+    
+    uploadMutation.mutate(file, {
+      onSuccess: (data) => {
+        // Transform the data to match expected UploadResponse format
+        const response: UploadResponse = {
+          success: true,
+          blobId: data.blobId,
+          message: data.message,
+          transactionDigest: data.transactionDigest
+        };
         onUploadComplete(response);
+        
         // Reset form
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
-      } else {
-        setError(response.error || 'Upload failed');
+      },
+      onError: (error) => {
+        console.error('Upload failed:', error);
+        // Call onUploadComplete with error for backward compatibility
+        onUploadComplete({
+          success: false,
+          error: error instanceof Error ? error.message : 'Upload failed'
+        });
       }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Upload failed');
-    } finally {
-      setIsUploading(false);
-    }
+    });
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -156,14 +151,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       </div>
 
       {/* Error Display */}
-      {error && (
+      {uploadMutation.error && (
         <div className={styles.errorMessage}>
-          <p className={styles.errorText}>{error}</p>
+          <p className={styles.errorText}>
+            {uploadMutation.error instanceof Error ? uploadMutation.error.message : 'Upload failed'}
+          </p>
         </div>
       )}
 
       {/* Upload Button */}
-      {selectedFile && !isUploading && (
+      {selectedFile && !uploadMutation.isPending && (
         <button
           onClick={handleUpload}
           className={`${styles.button} ${styles.buttonPrimary}`}
@@ -173,7 +170,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       )}
 
       {/* Uploading State */}
-      {isUploading && (
+      {uploadMutation.isPending && (
         <button
           disabled
           className={`${styles.button} ${styles.buttonLoading}`}

@@ -1,7 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { FileList } from './components/FileList';
 import { MarkdownEditor } from './components/MarkdownEditor';
-import { TuskyService } from './services/tuskyService';
 // import { WalletProvider, ConnectButton } from './components/WalletProvider';
 import styles from './App.module.css';
 
@@ -9,12 +8,6 @@ function App() {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [isNewFile, setIsNewFile] = useState(false);
-  
-  const tuskyService = useRef<TuskyService | null>(null);
-
-  if (!tuskyService.current) {
-    tuskyService.current = TuskyService.getInstance();
-  }
 
   const handleFileSelect = (fileId: string, fileName: string) => {
     setSelectedFileId(fileId);
@@ -29,10 +22,9 @@ function App() {
   };
 
   const handleSave = (fileName: string) => {
-    // Refresh the file list by clearing selection and letting it reload
+    // With React Query optimistic updates, the file list will update automatically
     setSelectedFileName(fileName);
     setIsNewFile(false);
-    // The FileList component will reload files automatically
   };
 
   const handleCancel = () => {

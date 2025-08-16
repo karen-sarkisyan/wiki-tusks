@@ -1,11 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TuskyService } from '../services/tuskyService';
+import React from 'react';
+import { useFileList, useRefreshFiles } from '../hooks/useFiles';
 import styles from './FileList.module.css';
-
-interface FileItem {
-  id: string;
-  name: string;
-}
 
 interface FileListProps {
   onFileSelect: (fileId: string, fileName: string) => void;
@@ -14,39 +9,11 @@ interface FileListProps {
 }
 
 export const FileList: React.FC<FileListProps> = ({ onFileSelect, onAddArticle, selectedFileId }) => {
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const tuskyService = useRef<TuskyService | null>(null);
-
-  if (!tuskyService.current) {
-    tuskyService.current = TuskyService.getInstance();
-  }
-
-  useEffect(() => {
-    loadFiles();
-  }, []);
-
-  const loadFiles = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fileList = await tuskyService.current!.listFiles();
-      // Filter only markdown files
-      const markdownFiles = fileList.filter(file => 
-        file.name.endsWith('.md') || file.name.endsWith('.markdown')
-      );
-      setFiles(markdownFiles);
-    } catch (error) {
-      setError('Failed to load files');
-      console.error('Error loading files:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: files = [], isLoading: loading, error } = useFileList();
+  const refreshFiles = useRefreshFiles();
 
   const handleRefresh = () => {
-    loadFiles();
+    refreshFiles();
   };
 
   if (loading) {
@@ -67,7 +34,7 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect, onAddArticle, 
           <h2 className={styles.title}>Files</h2>
         </div>
         <div className={styles.error}>
-          <p>{error}</p>
+          <p>{error instanceof Error ? error.message : 'Failed to load files'}</p>
           <button onClick={handleRefresh} className={styles.retryButton}>
             Retry
           </button>

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { MDXEditor, headingsPlugin, listsPlugin, quotePlugin, thematicBreakPlugin, markdownShortcutPlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, CodeToggle, CreateLink, InsertThematicBreak, ListsToggle, BlockTypeSelect, type MDXEditorMethods } from '@mdxeditor/editor';
-import { TuskyService } from '../services/tuskyService';
+import { useFileContent, useFileUpload } from '../hooks/useFiles';
 import styles from './MarkdownEditor.module.css';
 import '@mdxeditor/editor/style.css';
 
@@ -21,77 +21,49 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 }) => {
   const [content, setContent] = useState('');
   const [isEditing, setIsEditing] = useState(isNewFile);
-  const [isSaving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [currentFileName, setCurrentFileName] = useState(fileName || 'new-article.md');
   
   const editorRef = useRef<MDXEditorMethods>(null);
-  const tuskyService = useRef<TuskyService | null>(null);
-
-  if (!tuskyService.current) {
-    tuskyService.current = TuskyService.getInstance();
-  }
+  
+  // Use React Query hooks
+  const { 
+    data: fileContent, 
+    isLoading: loading, 
+    error: loadError 
+  } = useFileContent(fileId);
+  
+  const uploadMutation = useFileUpload();
 
   useEffect(() => {
-    if (fileId && !isNewFile) {
-      loadFileContent();
+    if (fileContent && !isNewFile) {
+      setContent(fileContent);
     } else if (isNewFile) {
       setContent('# New Article\n\nStart writing your content here...');
       setIsEditing(true);
     }
-  }, [fileId, isNewFile]);
-
-  const loadFileContent = async () => {
-    if (!fileId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      const fileContent = await tuskyService.current!.readFileContent(fileId);
-      if (fileContent) {
-        setContent(fileContent);
-      } else {
-        setError('Failed to load file content');
-      }
-    } catch (error) {
-      setError('Error loading file');
-      console.error('Error loading file content:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fileContent, isNewFile]);
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
   const handleSave = async () => {
-    try {
-      setSaving(true);
-      setError(null);
-      
-      const markdownContent = editorRef.current?.getMarkdown() || content;
-      
-      // Create a new file with the content
-      const blob = new Blob([markdownContent], { type: 'text/markdown' });
-      const file = new File([blob], currentFileName, { type: 'text/markdown' });
-      
-      const response = await tuskyService.current!.uploadFile(file);
-      
-      if (response.success) {
+    const markdownContent = editorRef.current?.getMarkdown() || content;
+    
+    // Create a new file with the content
+    const blob = new Blob([markdownContent], { type: 'text/markdown' });
+    const file = new File([blob], currentFileName, { type: 'text/markdown' });
+    
+    uploadMutation.mutate(file, {
+      onSuccess: (data) => {
         setContent(markdownContent);
         setIsEditing(false);
         onSave(currentFileName);
-      } else {
-        setError(response.error || 'Failed to save file');
+      },
+      onError: (error) => {
+        console.error('Error saving file:', error);
       }
-    } catch (error) {
-      setError('Error saving file');
-      console.error('Error saving file:', error);
-    } finally {
-      setSaving(false);
-    }
+    });
   };
 
   const handleCancel = () => {
@@ -154,8 +126,12 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         </div>
         
         <div className={styles.actions}>
-          {error && (
-            <span className={styles.error}>{error}</span>
+          {(loadError || uploadMutation.error) && (
+            <span className={styles.error}>
+              {loadError instanceof Error ? loadError.message : 
+               uploadMutation.error instanceof Error ? uploadMutation.error.message : 
+               'An error occurred'}
+            </span>
           )}
           
           {!isEditing ? (
@@ -170,16 +146,16 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               <button 
                 onClick={handleCancel} 
                 className={styles.cancelButton}
-                disabled={isSaving}
+                disabled={uploadMutation.isPending}
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSave} 
                 className={styles.saveButton}
-                disabled={isSaving}
+                disabled={uploadMutation.isPending}
               >
-                {isSaving ? (
+                {uploadMutation.isPending ? (
                   <>
                     <svg className={styles.spinner} width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.3" />
