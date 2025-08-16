@@ -16,7 +16,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!tuskyService.current) {
-    tuskyService.current = new TuskyService();
+    tuskyService.current = TuskyService.getInstance();
   }
 
   const handleFileSelect = (file: File) => {

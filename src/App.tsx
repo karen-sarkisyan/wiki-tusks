@@ -1,19 +1,44 @@
-import { useState } from 'react';
-import { FileUpload } from './components/FileUpload';
-import { UploadResult } from './components/UploadResult';
+import { useState, useRef } from 'react';
+import { FileList } from './components/FileList';
+import { MarkdownEditor } from './components/MarkdownEditor';
+import { TuskyService } from './services/tuskyService';
 // import { WalletProvider, ConnectButton } from './components/WalletProvider';
-import { UploadResponse } from './types';
 import styles from './App.module.css';
 
 function App() {
-  const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [isNewFile, setIsNewFile] = useState(false);
+  
+  const tuskyService = useRef<TuskyService | null>(null);
 
-  const handleUploadComplete = (response: UploadResponse) => {
-    setUploadResult(response);
+  if (!tuskyService.current) {
+    tuskyService.current = TuskyService.getInstance();
+  }
+
+  const handleFileSelect = (fileId: string, fileName: string) => {
+    setSelectedFileId(fileId);
+    setSelectedFileName(fileName);
+    setIsNewFile(false);
   };
 
-  const handleReset = () => {
-    setUploadResult(null);
+  const handleAddArticle = () => {
+    setSelectedFileId(null);
+    setSelectedFileName(null);
+    setIsNewFile(true);
+  };
+
+  const handleSave = (fileName: string) => {
+    // Refresh the file list by clearing selection and letting it reload
+    setSelectedFileName(fileName);
+    setIsNewFile(false);
+    // The FileList component will reload files automatically
+  };
+
+  const handleCancel = () => {
+    setIsNewFile(false);
+    setSelectedFileId(null);
+    setSelectedFileName(null);
   };
 
   return (
@@ -41,10 +66,10 @@ function App() {
               </div>
               <div className={styles.logoText}>
                 <h1 className={styles.logoTitle}>
-                  Tusky Uploader
+                  Markdown Editor
                 </h1>
                 <p className={styles.logoSubtitle}>
-                  Decentralized storage for the web
+                  Powered by Tusky storage
                 </p>
               </div>
             </div>
@@ -57,54 +82,22 @@ function App() {
 
       {/* Main Content */}
       <main className={styles.main}>
-        <div className={styles.hero}>
-          <h2 className={styles.heroTitle}>
-            Upload Your Files
-          </h2>
-          <p className={styles.heroDescription}>
-            Store your files on Tusky, a decentralized storage network that provides 
-            cost-effective, reliable storage for the web. Files are stored using advanced erasure 
-            coding for maximum efficiency.
-          </p>
-        </div>
-
-        {/* Upload Flow */}
-        {!uploadResult ? (
-          <FileUpload onUploadComplete={handleUploadComplete} />
-        ) : (
-          <UploadResult result={uploadResult} onReset={handleReset} />
-        )}
-
-        {/* Information Section */}
-        <div className={styles.info}>
-          <div className={styles.infoCard}>
-            <h3 className={styles.infoTitle}>
-              About Tusky Storage
-            </h3>
-            <div className={styles.infoGrid}>
-              <div>
-                <h4 className={styles.sectionTitle}>
-                  How it works
-                </h4>
-                <ul className={styles.sectionList}>
-                  <li className={styles.sectionListItem}>• Files are split into chunks and distributed across the network</li>
-                  <li className={styles.sectionListItem}>• Advanced erasure coding ensures data reliability</li>
-                  <li className={styles.sectionListItem}>• Storage costs are approximately 5x the file size</li>
-                  <li className={styles.sectionListItem}>• Files are publicly accessible and discoverable</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className={styles.sectionTitle}>
-                  Benefits
-                </h4>
-                <ul className={styles.sectionList}>
-                  <li className={styles.sectionListItem}>• Decentralized and censorship-resistant</li>
-                  <li className={styles.sectionListItem}>• Cost-effective storage for large files</li>
-                  <li className={styles.sectionListItem}>• Built-in redundancy and reliability</li>
-                  <li className={styles.sectionListItem}>• No single point of failure</li>
-                </ul>
-              </div>
-            </div>
+        <div className={styles.editorLayout}>
+          <div className={styles.sidebar}>
+            <FileList 
+              onFileSelect={handleFileSelect}
+              onAddArticle={handleAddArticle}
+              selectedFileId={selectedFileId}
+            />
+          </div>
+          <div className={styles.editorPane}>
+            <MarkdownEditor
+              fileId={selectedFileId}
+              fileName={selectedFileName}
+              isNewFile={isNewFile}
+              onSave={handleSave}
+              onCancel={handleCancel}
+            />
           </div>
         </div>
       </main>
@@ -113,7 +106,7 @@ function App() {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <p>
-            Built with ❤️ for the decentralized web. Powered by{' '}
+            Markdown editor built with ❤️ for the decentralized web. Powered by{' '}
             <a
               href="https://tusky.io"
               target="_blank"
