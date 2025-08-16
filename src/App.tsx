@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FileUpload } from './components/FileUpload';
 import { UploadResult } from './components/UploadResult';
-import { WalletProvider, ConnectButton } from './components/WalletProvider';
+// import { WalletProvider, ConnectButton } from './components/WalletProvider';
 import { UploadResponse } from './types';
 import styles from './App.module.css';
 
@@ -17,7 +17,7 @@ function App() {
   };
 
   return (
-    <WalletProvider>
+    // <WalletProvider>
       <div className={styles.container}>
       {/* Header */}
       <header className={styles.header}>
@@ -41,16 +41,16 @@ function App() {
               </div>
               <div className={styles.logoText}>
                 <h1 className={styles.logoTitle}>
-                  Walrus Uploader
+                  Tusky Uploader
                 </h1>
                 <p className={styles.logoSubtitle}>
                   Decentralized storage for the web
                 </p>
               </div>
             </div>
-            <div className={styles.headerActions}>
+            {/* <div className={styles.headerActions}>
               <ConnectButton />
-            </div>
+            </div> */}
           </div>
         </div>
       </header>
@@ -59,10 +59,10 @@ function App() {
       <main className={styles.main}>
         <div className={styles.hero}>
           <h2 className={styles.heroTitle}>
-            Upload Your Markdown Files
+            Upload Your Files
           </h2>
           <p className={styles.heroDescription}>
-            Store your markdown files on Walrus, a decentralized storage network that provides 
+            Store your files on Tusky, a decentralized storage network that provides 
             cost-effective, reliable storage for the web. Files are stored using advanced erasure 
             coding for maximum efficiency.
           </p>
@@ -79,7 +79,7 @@ function App() {
         <div className={styles.info}>
           <div className={styles.infoCard}>
             <h3 className={styles.infoTitle}>
-              About Walrus Storage
+              About Tusky Storage
             </h3>
             <div className={styles.infoGrid}>
               <div>
@@ -115,19 +115,19 @@ function App() {
           <p>
             Built with ❤️ for the decentralized web. Powered by{' '}
             <a
-              href="https://walrus.space"
+              href="https://tusky.io"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.footerLink}
             >
-              Walrus
+              Tusky
             </a>
             .
           </p>
         </div>
       </footer>
       </div>
-    </WalletProvider>
+    // </WalletProvider>
   );
 }
 

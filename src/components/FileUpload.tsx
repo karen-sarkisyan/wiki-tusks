@@ -1,6 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { WalrusService } from '../services/walrusService';
-import { useWallet } from './WalletProvider';
+import React, { useState, useRef } from 'react';
+import { TuskyService } from '../services/tuskyService';
 import { UploadProgress, UploadResponse, FileInfo } from '../types';
 import styles from './FileUpload.module.css';
 
@@ -9,7 +8,6 @@ interface FileUploadProps {
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
-  const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
@@ -17,38 +15,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const [useTestnet, setUseTestnet] = useState(true);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const walrusService = useRef(new WalrusService(useTestnet));
-  const { currentAccount, signTransaction } = useWallet();
+  const tuskyService = useRef(new TuskyService(useTestnet));
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-  }, []);
 
   const handleFileSelect = (file: File) => {
     setError(null);
     
-    // Validate file type
-    if (!file.name.toLowerCase().endsWith('.md')) {
-      setError('Please select a markdown (.md) file');
-      return;
-    }
-
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setError('File size must be less than 10MB');
@@ -73,21 +46,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const handleUpload = async () => {
     if (!selectedFile || !fileInputRef.current?.files?.[0]) return;
 
-    // Check if wallet is connected
-    if (!currentAccount) {
-      setError('Please connect your wallet first to upload to Walrus');
-      return;
-    }
-
     setIsUploading(true);
     setError(null);
     setUploadProgress(null);
 
     try {
       const file = fileInputRef.current.files[0];
-      const response = await walrusService.current.uploadFile(
+      const response = await tuskyService.current.uploadFile(
         file,
-        signTransaction,
         (progress) => setUploadProgress(progress)
       );
 
@@ -111,7 +77,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
   const handleNetworkChange = (useTestnet: boolean) => {
     setUseTestnet(useTestnet);
-    walrusService.current.setNetwork(useTestnet);
+    tuskyService.current.setNetwork(useTestnet);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -152,111 +118,82 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
           </label>
         </div>
         <p className={styles.helpText}>
-          Current network: {walrusService.current.getNetworkName()} | RPC: {walrusService.current.getRelayUrl()}
+          Current network: {tuskyService.current.getNetworkName()} | RPC: {tuskyService.current.getRelayUrl()}
         </p>
       </div>
 
-      {/* Wallet Connection Status */}
+
+
+      {/* File Selection */}
       <div className={styles.section}>
         <label className={styles.label}>
-          Wallet Status
+          Select File
         </label>
-        <div className={styles.statusIndicator}>
-          {currentAccount ? (
-            <div className={styles.statusIndicator}>
-              <div className={`${styles.statusDot} ${styles.statusConnected}`}></div>
-              <span className={styles.statusText}>
-                Connected: {currentAccount.address.slice(0, 6)}...{currentAccount.address.slice(-4)}
-              </span>
+        <div className={styles.fileSelectionArea}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileInputChange}
+            className={styles.hiddenInput}
+          />
+          
+          {!selectedFile ? (
+            <div className={styles.fileSelectionContent}>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={styles.fileSelectButton}
+              >
+                <svg
+                  className={styles.uploadIcon}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+                Choose File
+              </button>
+              <p className={styles.uploadHint}>
+                Select any file up to 10MB
+              </p>
             </div>
           ) : (
-            <div className={styles.statusIndicator}>
-              <div className={`${styles.statusDot} ${styles.statusDisconnected}`}></div>
-              <span className={styles.statusText}>
-                Not Connected - Please connect your wallet to upload files
-              </span>
+            <div className={styles.selectedFileInfo}>
+              <div className={styles.fileDetails}>
+                <svg
+                  className={styles.fileIcon}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <div className={styles.fileInfo}>
+                  <p className={styles.fileName}>{selectedFile.name}</p>
+                  <p className={styles.fileSize}>{formatFileSize(selectedFile.size)}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={styles.changeFileButton}
+              >
+                Change File
+              </button>
             </div>
           )}
         </div>
-        <p className={styles.helpText}>
-          Walrus requires a wallet connection to sign transactions for file uploads
-        </p>
-      </div>
-
-      {/* File Upload Area */}
-      <div
-        className={`${styles.uploadArea} ${
-          isDragOver ? styles.uploadAreaDragover : ''
-        } ${selectedFile ? styles.uploadAreaSelected : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".md"
-          onChange={handleFileInputChange}
-          className={styles.hiddenInput}
-        />
-        
-        {!selectedFile ? (
-          <div>
-            <svg
-              className={styles.uploadIcon}
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <div className={styles.uploadContent}>
-              <p className={styles.uploadTitle}>
-                Drop your markdown file here
-              </p>
-              <p className={styles.uploadSubtitle}>
-                or click to browse files
-              </p>
-              <p className={styles.uploadHint}>
-                Only .md files up to 10MB are supported
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <svg
-              className={`${styles.uploadIcon} ${styles.uploadIconSelected}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div className={styles.uploadContent}>
-              <p className={styles.uploadTitle}>
-                {selectedFile.name}
-              </p>
-              <p className={styles.uploadSubtitle}>
-                {formatFileSize(selectedFile.size)}
-              </p>
-              <p className={styles.uploadHint}>
-                Click to change file
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Error Display */}
@@ -286,14 +223,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       {selectedFile && !isUploading && (
         <button
           onClick={handleUpload}
-          disabled={!currentAccount}
-          className={`${styles.button} ${
-            currentAccount 
-              ? styles.buttonPrimary
-              : styles.buttonDisabled
-          }`}
+          className={`${styles.button} ${styles.buttonPrimary}`}
         >
-          {currentAccount ? 'Upload to Walrus' : 'Connect Wallet to Upload'}
+          Upload to Tusky
         </button>
       )}
 
