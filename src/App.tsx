@@ -58,10 +58,10 @@ function App() {
               </div>
               <div className={styles.logoText}>
                 <h1 className={styles.logoTitle}>
-                  Markdown Editor
+                  WikiTusks
                 </h1>
                 <p className={styles.logoSubtitle}>
-                  Powered by Tusky storage
+                  Powered by Walrus
                 </p>
               </div>
             </div>

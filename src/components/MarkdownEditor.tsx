@@ -21,7 +21,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 }) => {
   // const [content, setContent] = useState('');
   const [isEditing, setIsEditing] = useState(isNewFile);
-  const [currentFileName, setCurrentFileName] = useState(fileName || 'new-article.md');
+  const [currentFileName, setCurrentFileName] = useState(isNewFile ? 'new-article.md' : fileName || '');
   
   const editorRef = useRef<MDXEditorMethods>(null);
   
@@ -35,7 +35,10 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   useEffect(() => {
     setIsEditing(isNewFile);
-  }, [isNewFile]);
+    if (!isNewFile && fileName) {
+      setCurrentFileName(fileName);
+    }
+  }, [isNewFile, fileName]);
 
   // Update editor content when content changes (only for existing files)
   useEffect(() => {
@@ -112,7 +115,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.fileInfo}>
-          {isNewFile || isEditing ? (
+          {isNewFile ? (
             <input
               type="text"
               value={currentFileName}
