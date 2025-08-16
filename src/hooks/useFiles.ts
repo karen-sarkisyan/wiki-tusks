@@ -80,7 +80,7 @@ export const useFileUpload = () => {
       // Return a context object with the snapshotted value
       return { previousFiles, optimisticFile };
     },
-    onError: (err, newFile, context) => {
+    onError: (_err, _newFile, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousFiles) {
         queryClient.setQueryData(fileQueryKeys.lists(), context.previousFiles);

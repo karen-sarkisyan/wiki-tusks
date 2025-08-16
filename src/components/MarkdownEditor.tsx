@@ -19,15 +19,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onSave, 
   onCancel 
 }) => {
-  const [content, setContent] = useState('');
+  // const [content, setContent] = useState('');
   const [isEditing, setIsEditing] = useState(isNewFile);
   const [currentFileName, setCurrentFileName] = useState(fileName || 'new-article.md');
   
   const editorRef = useRef<MDXEditorMethods>(null);
   
-  // Use React Query hooks
   const { 
-    data: fileContent, 
+    data: content, 
     isLoading: loading, 
     error: loadError 
   } = useFileContent(fileId);
@@ -35,28 +34,29 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const uploadMutation = useFileUpload();
 
   useEffect(() => {
-    if (fileContent && !isNewFile) {
-      setContent(fileContent);
-    } else if (isNewFile) {
-      setContent('# New Article\n\nStart writing your content here...');
-      setIsEditing(true);
-    }
-  }, [fileContent, isNewFile]);
+    setIsEditing(isNewFile);
+  }, [isNewFile]);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  // Update editor content when content changes (only for existing files)
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setMarkdown(content || '');
+    }
+  }, [content, isNewFile]);
 
   const handleSave = async () => {
     const markdownContent = editorRef.current?.getMarkdown() || content;
+    if (!markdownContent) {
+      // @TODO: handle this better
+      return;
+    }
     
     // Create a new file with the content
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
     const file = new File([blob], currentFileName, { type: 'text/markdown' });
     
     uploadMutation.mutate(file, {
-      onSuccess: (data) => {
-        setContent(markdownContent);
+      onSuccess: () => {
         setIsEditing(false);
         onSave(currentFileName);
       },
@@ -73,7 +73,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       setIsEditing(false);
       // Reset content to original
       if (editorRef.current) {
-        editorRef.current.setMarkdown(content);
+        editorRef.current.setMarkdown(content || '');
       }
     }
   };
@@ -86,7 +86,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     setCurrentFileName(newName);
   };
 
-  if (loading) {
+  if (loading && !isNewFile) {
     return (
       <div className={styles.container}>
         <div className={styles.loading}>Loading file content...</div>
@@ -134,14 +134,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </span>
           )}
           
-          {!isEditing ? (
-            <button onClick={handleEdit} className={styles.editButton}>
+          {!isEditing && !isNewFile ? (
+            <button onClick={() => setIsEditing(true)} className={styles.editButton}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Edit
             </button>
-          ) : (
+          ) : (isEditing && (
             <>
               <button 
                 onClick={handleCancel} 
@@ -173,53 +173,40 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                 )}
               </button>
             </>
-          )}
+          ))}
         </div>
       </div>
 
       <div className={styles.content}>
-        {isEditing ? (
-          <div className={styles.editorWrapper}>
-            <MDXEditor
-              ref={editorRef}
-              markdown={content}
-              onChange={setContent}
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                thematicBreakPlugin(),
-                markdownShortcutPlugin(),
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <BlockTypeSelect />
-                      <BoldItalicUnderlineToggles />
-                      <CodeToggle />
-                      <CreateLink />
-                      <ListsToggle />
-                      <InsertThematicBreak />
-                    </>
-                  )
-                })
-              ]}
-              className={styles.editor}
-            />
-          </div>
-        ) : (
-          <div className={styles.preview}>
-            <div 
-              className={styles.markdownContent}
-              dangerouslySetInnerHTML={{ 
-                __html: content.replace(/\n/g, '<br>').replace(/#{1,6}\s/g, match => {
-                  const level = match.trim().length;
-                  return `</p><h${level}>`;
-                }).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')
-              }}
-            />
-          </div>
-        )}
+        <div className={styles.editorWrapper}>
+          <MDXEditor
+            key={fileId || 'new-file'}
+            ref={editorRef}
+            markdown={isNewFile ? '' : (content || '')}
+            readOnly={!isEditing}
+            plugins={[
+              headingsPlugin(),
+              listsPlugin(),
+              quotePlugin(),
+              thematicBreakPlugin(),
+              markdownShortcutPlugin(),
+              ...(isEditing ? [toolbarPlugin({
+                toolbarContents: () => (
+                  <>
+                    <UndoRedo />
+                    <BlockTypeSelect />
+                    <BoldItalicUnderlineToggles />
+                    <CodeToggle />
+                    <CreateLink />
+                    <ListsToggle />
+                    <InsertThematicBreak />
+                  </>
+                )
+              })] : [])
+            ]}
+            className={styles.editor}
+          />
+        </div>
       </div>
     </div>
   );
