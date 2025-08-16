@@ -3,7 +3,6 @@ import {
   createNetworkConfig,
   SuiClientProvider,
   WalletProvider as SuiWalletProvider,
-  ConnectButton as SuiConnectButton,
   ConnectModal,
   useCurrentAccount,
   useSignTransaction,
@@ -12,6 +11,7 @@ import {
 } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import styles from './WalletProvider.module.css';
 
 // Create network config
 const { networkConfig } = createNetworkConfig({
@@ -82,7 +82,7 @@ export function ConnectButton({ className }: { className?: string }) {
   return (
     <ConnectModal 
       trigger={
-      <button className={className} onClick={() => setIsOpen(true)}>
+      <button className={className || styles.connectButton} onClick={() => setIsOpen(true)}>
         Connect Wallet
       </button>}
 			open={isOpen}

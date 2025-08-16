@@ -10,5 +10,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'build'
+  },
+  optimizeDeps: {
+    exclude: ['@mysten/walrus-wasm']
   }
 })

@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { WalrusService } from '../services/walrusService';
 import { useWallet } from './WalletProvider';
 import { UploadProgress, UploadResponse, FileInfo } from '../types';
+import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
   onUploadComplete: (response: UploadResponse) => void;
@@ -122,71 +123,71 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className={styles.container}>
       {/* Network Selection */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className={styles.section}>
+        <label className={styles.label}>
           Network
         </label>
-        <div className="flex space-x-4">
-          <label className="flex items-center">
+        <div className={styles.radioGroup}>
+          <label className={styles.radioOption}>
             <input
               type="radio"
               name="network"
               checked={useTestnet}
               onChange={() => handleNetworkChange(true)}
-              className="mr-2"
+              className={styles.radioInput}
             />
-            <span className="text-sm text-gray-700">Testnet</span>
+            <span className={styles.radioLabel}>Testnet</span>
           </label>
-          <label className="flex items-center">
+          <label className={styles.radioOption}>
             <input
               type="radio"
               name="network"
               checked={!useTestnet}
               onChange={() => handleNetworkChange(false)}
-              className="mr-2"
+              className={styles.radioInput}
             />
-            <span className="text-sm text-gray-700">Mainnet</span>
+            <span className={styles.radioLabel}>Mainnet</span>
           </label>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className={styles.helpText}>
           Current network: {walrusService.current.getNetworkName()} | RPC: {walrusService.current.getRelayUrl()}
         </p>
       </div>
 
       {/* Wallet Connection Status */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className={styles.section}>
+        <label className={styles.label}>
           Wallet Status
         </label>
-        <div className="flex items-center space-x-2">
+        <div className={styles.statusIndicator}>
           {currentAccount ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-              <span className="text-sm text-gray-700">
+            <div className={styles.statusIndicator}>
+              <div className={`${styles.statusDot} ${styles.statusConnected}`}></div>
+              <span className={styles.statusText}>
                 Connected: {currentAccount.address.slice(0, 6)}...{currentAccount.address.slice(-4)}
               </span>
             </div>
           ) : (
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-              <span className="text-sm text-gray-700">
+            <div className={styles.statusIndicator}>
+              <div className={`${styles.statusDot} ${styles.statusDisconnected}`}></div>
+              <span className={styles.statusText}>
                 Not Connected - Please connect your wallet to upload files
               </span>
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className={styles.helpText}>
           Walrus requires a wallet connection to sign transactions for file uploads
         </p>
       </div>
 
       {/* File Upload Area */}
       <div
-        className={`upload-area border-2 border-dashed rounded-lg p-8 text-center cursor-pointer ${
-          isDragOver ? 'dragover' : 'border-gray-300'
-        } ${selectedFile ? 'border-green-300 bg-green-50' : ''}`}
+        className={`${styles.uploadArea} ${
+          isDragOver ? styles.uploadAreaDragover : ''
+        } ${selectedFile ? styles.uploadAreaSelected : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -197,13 +198,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
           type="file"
           accept=".md"
           onChange={handleFileInputChange}
-          className="hidden"
+          className={styles.hiddenInput}
         />
         
         {!selectedFile ? (
           <div>
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className={styles.uploadIcon}
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -216,14 +217,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
                 strokeLinejoin="round"
               />
             </svg>
-            <div className="mt-4">
-              <p className="text-lg font-medium text-gray-900">
+            <div className={styles.uploadContent}>
+              <p className={styles.uploadTitle}>
                 Drop your markdown file here
               </p>
-              <p className="text-sm text-gray-500">
+              <p className={styles.uploadSubtitle}>
                 or click to browse files
               </p>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className={styles.uploadHint}>
                 Only .md files up to 10MB are supported
               </p>
             </div>
@@ -231,7 +232,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
         ) : (
           <div>
             <svg
-              className="mx-auto h-12 w-12 text-green-400"
+              className={`${styles.uploadIcon} ${styles.uploadIconSelected}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -243,14 +244,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div className="mt-4">
-              <p className="text-lg font-medium text-gray-900">
+            <div className={styles.uploadContent}>
+              <p className={styles.uploadTitle}>
                 {selectedFile.name}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className={styles.uploadSubtitle}>
                 {formatFileSize(selectedFile.size)}
               </p>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className={styles.uploadHint}>
                 Click to change file
               </p>
             </div>
@@ -260,21 +261,21 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
       {/* Error Display */}
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className={styles.errorMessage}>
+          <p className={styles.errorText}>{error}</p>
         </div>
       )}
 
       {/* Upload Progress */}
       {uploadProgress && (
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+        <div className={styles.progress}>
+          <div className={styles.progressHeader}>
             <span>Uploading...</span>
             <span>{uploadProgress.percentage}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className={styles.progressBar}>
             <div
-              className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+              className={styles.progressFill}
               style={{ width: `${uploadProgress.percentage}%` }}
             ></div>
           </div>
@@ -286,10 +287,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
         <button
           onClick={handleUpload}
           disabled={!currentAccount}
-          className={`mt-6 w-full py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors ${
+          className={`${styles.button} ${
             currentAccount 
-              ? 'bg-primary-600 text-white hover:bg-primary-700' 
-              : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+              ? styles.buttonPrimary
+              : styles.buttonDisabled
           }`}
         >
           {currentAccount ? 'Upload to Walrus' : 'Connect Wallet to Upload'}
@@ -300,7 +301,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       {isUploading && (
         <button
           disabled
-          className="mt-6 w-full bg-gray-400 text-white py-3 px-4 rounded-md cursor-not-allowed"
+          className={`${styles.button} ${styles.buttonLoading}`}
         >
           Uploading...
         </button>

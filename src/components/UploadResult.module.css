@@ -1,0 +1,187 @@
+.container {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.successCard {
+  background-color: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.successHeader {
+  display: flex;
+  align-items: center;
+}
+
+.successIcon {
+  height: 2rem;
+  width: 2rem;
+  color: var(--green-400);
+  flex-shrink: 0;
+}
+
+.successContent {
+  margin-left: 0.75rem;
+}
+
+.successTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--green-800);
+}
+
+.successMessage {
+  font-size: 0.875rem;
+  color: var(--green-700);
+  margin-top: 0.25rem;
+}
+
+.fileInfo {
+  margin-top: 1rem;
+}
+
+.infoCard {
+  background-color: white;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  border: 1px solid var(--green-200);
+}
+
+.infoTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.infoItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.infoLabel {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.infoValue {
+  font-size: 0.875rem;
+  background-color: var(--gray-100);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: var(--gray-800);
+  font-family: monospace;
+}
+
+.infoValueLong {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.infoValueStatus {
+  background-color: transparent;
+  color: var(--green-600);
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.nextSteps {
+  margin-top: 1rem;
+  background-color: var(--blue-50);
+  border: 1px solid var(--blue-200);
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+.nextStepsTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--blue-900);
+  margin-bottom: 0.5rem;
+}
+
+.nextStepsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nextStepsItem {
+  font-size: 0.875rem;
+  color: var(--blue-800);
+  margin-bottom: 0.25rem;
+}
+
+.warning {
+  margin-top: 1rem;
+  background-color: var(--yellow-50);
+  border: 1px solid var(--yellow-200);
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+.warningTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--yellow-900);
+  margin-bottom: 0.5rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.warningItem {
+  font-size: 0.875rem;
+  color: var(--yellow-800);
+  margin-bottom: 0.25rem;
+}
+
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buttonPrimary {
+  background-color: var(--green-600);
+  color: white;
+}
+
+.buttonPrimary:hover {
+  background-color: var(--green-700);
+}
+
+.buttonSecondary {
+  background-color: var(--gray-600);
+  color: white;
+}
+
+.buttonSecondary:hover {
+  background-color: var(--gray-700);
+}
