@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { TuskyService } from '../services/tuskyService';
-import { UploadProgress, UploadResponse, FileInfo } from '../types';
+import { UploadResponse, FileInfo } from '../types';
 import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
@@ -9,15 +9,15 @@ interface FileUploadProps {
 
 export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [useTestnet, setUseTestnet] = useState(true);
+  const tuskyService = useRef<TuskyService | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const tuskyService = useRef(new TuskyService(useTestnet));
 
-
+  if (!tuskyService.current) {
+    tuskyService.current = new TuskyService();
+  }
 
   const handleFileSelect = (file: File) => {
     setError(null);
@@ -48,14 +48,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
     setIsUploading(true);
     setError(null);
-    setUploadProgress(null);
 
     try {
+      if (!tuskyService.current) {
+        throw new Error('Tusky service not initialized');
+      }
       const file = fileInputRef.current.files[0];
-      const response = await tuskyService.current.uploadFile(
-        file,
-        (progress) => setUploadProgress(progress)
-      );
+      const response = await tuskyService.current.uploadFile(file);
 
       if (response.success) {
         onUploadComplete(response);
@@ -71,13 +70,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       setError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setIsUploading(false);
-      setUploadProgress(null);
     }
-  };
-
-  const handleNetworkChange = (useTestnet: boolean) => {
-    setUseTestnet(useTestnet);
-    tuskyService.current.setNetwork(useTestnet);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -90,40 +83,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
   return (
     <div className={styles.container}>
-      {/* Network Selection */}
-      <div className={styles.section}>
-        <label className={styles.label}>
-          Network
-        </label>
-        <div className={styles.radioGroup}>
-          <label className={styles.radioOption}>
-            <input
-              type="radio"
-              name="network"
-              checked={useTestnet}
-              onChange={() => handleNetworkChange(true)}
-              className={styles.radioInput}
-            />
-            <span className={styles.radioLabel}>Testnet</span>
-          </label>
-          <label className={styles.radioOption}>
-            <input
-              type="radio"
-              name="network"
-              checked={!useTestnet}
-              onChange={() => handleNetworkChange(false)}
-              className={styles.radioInput}
-            />
-            <span className={styles.radioLabel}>Mainnet</span>
-          </label>
-        </div>
-        <p className={styles.helpText}>
-          Current network: {tuskyService.current.getNetworkName()} | RPC: {tuskyService.current.getRelayUrl()}
-        </p>
-      </div>
-
-
-
       {/* File Selection */}
       <div className={styles.section}>
         <label className={styles.label}>
@@ -200,22 +159,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       {error && (
         <div className={styles.errorMessage}>
           <p className={styles.errorText}>{error}</p>
-        </div>
-      )}
-
-      {/* Upload Progress */}
-      {uploadProgress && (
-        <div className={styles.progress}>
-          <div className={styles.progressHeader}>
-            <span>Uploading...</span>
-            <span>{uploadProgress.percentage}%</span>
-          </div>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${uploadProgress.percentage}%` }}
-            ></div>
-          </div>
         </div>
       )}
 

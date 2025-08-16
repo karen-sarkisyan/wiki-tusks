@@ -2,18 +2,10 @@ import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { WalrusClient, WalrusFile } from '@mysten/walrus';
 import { UploadResponse, UploadProgress } from '../types';
 
-// Sui network endpoints
-const SUI_NETWORKS = {
-  testnet: 'https://fullnode.testnet.sui.io',
-  mainnet: 'https://fullnode.mainnet.sui.io'
-};
-
 export class WalrusService {
   private walrusClient: any;
-  private useTestnet: boolean;
 
-  constructor(useTestnet: boolean = true) {
-    this.useTestnet = useTestnet;
+  constructor() {
     this.initializeClient();
   }
 
@@ -146,27 +138,5 @@ export class WalrusService {
       console.error('Error reading file from Walrus:', error);
       return null;
     }
-  }
-
-  /**
-   * Get the current network name
-   */
-  getNetworkName(): string {
-    return this.useTestnet ? 'Testnet' : 'Mainnet';
-  }
-
-  /**
-   * Get the current Sui RPC URL
-   */
-  getRelayUrl(): string {
-    return this.useTestnet ? SUI_NETWORKS.testnet : SUI_NETWORKS.mainnet;
-  }
-
-  /**
-   * Switch between testnet and mainnet
-   */
-  setNetwork(useTestnet: boolean): void {
-    this.useTestnet = useTestnet;
-    this.initializeClient();
   }
 }
