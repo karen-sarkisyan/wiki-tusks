@@ -1,54 +1,86 @@
 .container {
   min-height: 100vh;
-  background-color: var(--gray-50);
+  background-color: var(--newspaper-bg);
   display: flex;
   flex-direction: column;
 }
 
+/* Newspaper-style header */
 .header {
-  background-color: white;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid var(--gray-200);
+  background: linear-gradient(
+    135deg,
+    var(--newspaper-cream) 0%,
+    var(--newspaper-bg) 100%
+  );
+  border-bottom: 3px double var(--newspaper-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--newspaper-border) 50%,
+    transparent 100%
+  );
 }
 
 .headerContent {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
 
 .headerNav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 0;
+  padding: 1.25rem 0;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 .logoIcon {
-  height: 2rem;
-  width: 2rem;
-  color: var(--primary-600);
+  height: 2.5rem;
+  width: 2.5rem;
+  color: var(--wiki-blue);
   flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .logoText {
-  margin-left: 0.75rem;
+  margin-left: 1rem;
+  position: relative;
 }
 
 .logoTitle {
-  font-size: 1.5rem;
+  font-family: var(--font-serif);
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--newspaper-black);
+  letter-spacing: -0.025em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.125rem;
 }
 
 .logoSubtitle {
-  font-size: 0.875rem;
-  color: var(--gray-500);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--newspaper-light-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  font-weight: 500;
 }
 
 .headerActions {
@@ -57,32 +89,60 @@
   gap: 1rem;
 }
 
+/* Main content area with Wikipedia-style layout */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--newspaper-bg);
 }
 
 .editorLayout {
   display: flex;
-  height: calc(100vh - 80px - 80px); /* Subtract header and footer height */
-  max-width: none;
-  margin: 0;
-  padding: 0;
+  height: calc(100vh - 120px); /* Account for header and footer */
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  border-left: 1px solid var(--newspaper-border);
+  border-right: 1px solid var(--newspaper-border);
 }
 
+/* Wikipedia-style sidebar */
 .sidebar {
-  width: 300px;
-  min-width: 250px;
+  width: 320px;
+  min-width: 280px;
   max-width: 400px;
   resize: horizontal;
   overflow: hidden;
   flex-shrink: 0;
+  background: var(--gray-50);
+  border-right: 1px solid var(--newspaper-border);
+  position: relative;
 }
 
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--newspaper-border) 0%,
+    transparent 50%,
+    var(--newspaper-border) 100%
+  );
+  opacity: 0.3;
+}
+
+/* Main article area */
 .editorPane {
   flex: 1;
   overflow: hidden;
+  background: white;
+  position: relative;
 }
 
 .initializingState,
@@ -245,29 +305,56 @@
   margin-bottom: 0.5rem;
 }
 
+/* Newspaper-style footer */
 .footer {
-  background-color: white;
-  border-top: 1px solid var(--gray-200);
-  margin-top: 4rem;
+  background: linear-gradient(
+    135deg,
+    var(--newspaper-cream) 0%,
+    var(--gray-100) 100%
+  );
+  border-top: 3px double var(--newspaper-border);
+  position: relative;
+  margin-top: auto;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--newspaper-border) 50%,
+    transparent 100%
+  );
 }
 
 .footerContent {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 2rem;
   text-align: center;
-  font-size: 0.875rem;
-  color: var(--gray-500);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--newspaper-light-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
 }
 
 .footerLink {
-  color: var(--primary-600);
-  font-weight: 500;
+  color: var(--wiki-blue);
+  font-weight: 600;
   text-decoration: none;
+  text-transform: none;
 }
 
 .footerLink:hover {
-  color: var(--primary-700);
+  color: var(--wiki-blue-hover);
+  text-decoration: underline;
 }
 
 @media (min-width: 640px) {

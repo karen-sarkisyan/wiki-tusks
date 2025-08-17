@@ -52,17 +52,39 @@ function App() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
+                  {/* Walrus head outline */}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    d="M5 8c0-2 2-4 7-4s7 2 7 4c0 1.5-1 3-2 4"
+                  />
+                  {/* Left tusk */}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M9 12c0 0-0.5 6 1 10"
+                  />
+                  {/* Right tusk */}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M15 12c0 0 0.5 6-1 10"
+                  />
+                  {/* Walrus snout */}
+                  <ellipse
+                    cx="12"
+                    cy="10"
+                    rx="2.5"
+                    ry="1.5"
+                    strokeWidth={1.5}
                   />
                 </svg>
               </div>
               <div className={styles.logoText}>
                 <h1 className={styles.logoTitle}>WikiTusks</h1>
-                <p className={styles.logoSubtitle}>Powered by Walrus</p>
               </div>
             </div>
             {/* <div className={styles.headerActions}>
