@@ -9,7 +9,7 @@
 
 /* Modern editor header */
 .header {
-  padding: var(--space-6) var(--space-8);
+  padding: var(--space-5) var(--space-3);
   border-bottom: 1px solid var(--border-light);
   background: var(--bg-primary);
   display: flex;
@@ -28,6 +28,7 @@
   font-family: var(--font-primary);
   font-size: 1.5rem;
   font-weight: 600;
+  line-height: 32px;
   color: var(--text-primary);
   margin: 0;
   white-space: nowrap;

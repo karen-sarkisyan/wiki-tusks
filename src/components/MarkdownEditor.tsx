@@ -7,6 +7,7 @@ import {
   thematicBreakPlugin,
   markdownShortcutPlugin,
   toolbarPlugin,
+  imagePlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
   CodeToggle,
@@ -14,6 +15,7 @@ import {
   InsertThematicBreak,
   ListsToggle,
   BlockTypeSelect,
+  InsertImage,
   type MDXEditorMethods,
 } from '@mdxeditor/editor';
 import {
@@ -21,6 +23,7 @@ import {
   useAddArticle,
   useUpdateArticle,
 } from '../hooks/useArticles';
+import { imageUploadHandler } from '../utils/imageProcessing';
 import styles from './MarkdownEditor.module.css';
 import '@mdxeditor/editor/style.css';
 
@@ -154,7 +157,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <h3 className={styles.placeholderTitle}>Select an article to edit</h3>
+          <h3 className={styles.placeholderTitle}>Read or write?</h3>
           <p className={styles.placeholderText}>
             Choose an article from the left panel or create a new article
           </p>
@@ -280,6 +283,10 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               quotePlugin(),
               thematicBreakPlugin(),
               markdownShortcutPlugin(),
+              imagePlugin({
+                imageUploadHandler,
+                imageAutocompleteSuggestions: [],
+              }),
               toolbarPlugin({
                 toolbarClassName: `${styles.toolbar} ${
                   !isEditing ? 'hidden' : ''
@@ -292,6 +299,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                       <BoldItalicUnderlineToggles />
                       <CodeToggle />
                       <CreateLink />
+                      <InsertImage />
                       <ListsToggle />
                       <InsertThematicBreak />
                     </>

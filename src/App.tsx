@@ -119,7 +119,7 @@ function App() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <p>Built with ❤️ using React, TypeScript, and Walrus</p>
+          <p>Built in 🗽 for ETHGlobal</p>
         </div>
       </footer>
     </div>
