@@ -28,13 +28,12 @@ export class WalrusService {
     onProgress?: (progress: UploadProgress) => void
   ): Promise<UploadResponse> {
     try {
-      // Validate file type
-      if (!file.name.toLowerCase().endsWith('.md')) {
-        throw new Error('Only markdown (.md) files are supported');
-      }
+      // File validation - accepting all files as markdown content
 
       if (!signer) {
-        throw new Error('Wallet connection required. Please connect your wallet first.');
+        throw new Error(
+          'Wallet connection required. Please connect your wallet first.'
+        );
       }
 
       // Convert file to Uint8Array
@@ -48,21 +47,21 @@ export class WalrusService {
         tags: {
           'content-type': file.type || 'text/markdown',
           'original-name': file.name,
-          'file-size': file.size.toString()
-        }
+          'file-size': file.size.toString(),
+        },
       });
 
       // Simulate progress updates since SDK doesn't provide built-in progress tracking
       if (onProgress) {
         onProgress({ loaded: 0, total: file.size, percentage: 0 });
-        
+
         // Update progress during upload
         const progressInterval = setInterval(() => {
           const randomProgress = Math.min(90, Math.random() * 80 + 10);
-          onProgress({ 
-            loaded: Math.floor((randomProgress / 100) * file.size), 
-            total: file.size, 
-            percentage: Math.floor(randomProgress) 
+          onProgress({
+            loaded: Math.floor((randomProgress / 100) * file.size),
+            total: file.size,
+            percentage: Math.floor(randomProgress),
           });
         }, 500);
 
@@ -72,11 +71,11 @@ export class WalrusService {
             files: [walrusFile],
             epochs: 3, // Store for 3 epochs
             deletable: true,
-            signer: signer
+            signer: signer,
           });
 
           clearInterval(progressInterval);
-          
+
           // Complete progress
           onProgress({ loaded: file.size, total: file.size, percentage: 100 });
 
@@ -86,12 +85,11 @@ export class WalrusService {
               success: true,
               blobId: result.blobId || result.id,
               message: 'File uploaded successfully to Walrus using SDK',
-              transactionDigest: result.transactionDigest
+              transactionDigest: result.transactionDigest,
             };
           } else {
             throw new Error('No results returned from Walrus upload');
           }
-
         } catch (uploadError) {
           clearInterval(progressInterval);
           throw uploadError;
@@ -102,7 +100,7 @@ export class WalrusService {
           files: [walrusFile],
           epochs: 3,
           deletable: true,
-          signer: signer
+          signer: signer,
         });
 
         if (results && results.length > 0) {
@@ -111,18 +109,18 @@ export class WalrusService {
             success: true,
             blobId: result.blobId || result.id,
             message: 'File uploaded successfully to Walrus using SDK',
-            transactionDigest: result.transactionDigest
+            transactionDigest: result.transactionDigest,
           };
         } else {
           throw new Error('No results returned from Walrus upload');
         }
       }
-
     } catch (error) {
       console.error('Walrus upload error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }

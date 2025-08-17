@@ -41,7 +41,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(isNewFile);
   const [currentFileName, setCurrentFileName] = useState(
-    isNewFile ? 'new-article.md' : fileName || ''
+    isNewFile ? 'new-article' : fileName || ''
   );
 
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -79,7 +79,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     if (isNewFile) {
       // Create new article
       const article = {
-        title: currentFileName.replace(/\.(md|markdown)$/, ''), // Remove extension for title
+        title: currentFileName, // Use filename directly as title
       };
 
       addArticleMutation.mutate(
@@ -123,10 +123,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   };
 
   const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newName = e.target.value;
-    if (newName && !newName.endsWith('.md') && !newName.endsWith('.markdown')) {
-      newName += '.md';
-    }
+    const newName = e.target.value;
     setCurrentFileName(newName);
   };
 

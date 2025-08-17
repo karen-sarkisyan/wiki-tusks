@@ -42,10 +42,7 @@ export class WalrusHttpService {
     onProgress?: (progress: UploadProgress) => void
   ): Promise<UploadResponse> {
     try {
-      // Validate file type
-      if (!file.name.toLowerCase().endsWith('.md')) {
-        throw new Error('Only markdown (.md) files are supported');
-      }
+      // File validation - accepting all files as markdown content
 
       const url = `${this.PUBLISHER_URL}/v1/blobs?epochs=${epochs}`;
 
