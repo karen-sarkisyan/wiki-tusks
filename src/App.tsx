@@ -1,41 +1,45 @@
 import { useState } from 'react';
-import { FileList } from './components/FileList';
+import { ArticleList } from './components/ArticleList';
 import { MarkdownEditor } from './components/MarkdownEditor';
 // import { WalletProvider, ConnectButton } from './components/WalletProvider';
 import styles from './App.module.css';
 
 function App() {
-  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-  const [isNewFile, setIsNewFile] = useState(false);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(
+    null
+  );
+  const [selectedArticleTitle, setSelectedArticleTitle] = useState<
+    string | null
+  >(null);
+  const [isNewArticle, setIsNewArticle] = useState(false);
 
-  const handleFileSelect = (fileId: string, fileName: string) => {
-    setSelectedFileId(fileId);
-    setSelectedFileName(fileName);
-    setIsNewFile(false);
+  const handleArticleSelect = (articleId: string, articleTitle: string) => {
+    setSelectedArticleId(articleId);
+    setSelectedArticleTitle(articleTitle);
+    setIsNewArticle(false);
   };
 
   const handleAddArticle = () => {
-    setSelectedFileId(null);
-    setSelectedFileName(null);
-    setIsNewFile(true);
+    setSelectedArticleId(null);
+    setSelectedArticleTitle(null);
+    setIsNewArticle(true);
   };
 
-  const handleSave = (fileName: string) => {
-    // With React Query optimistic updates, the file list will update automatically
-    setSelectedFileName(fileName);
-    setIsNewFile(false);
+  const handleSave = (articleTitle: string) => {
+    // With React Query optimistic updates, the article list will update automatically
+    setSelectedArticleTitle(articleTitle);
+    setIsNewArticle(false);
   };
 
   const handleCancel = () => {
-    setIsNewFile(false);
-    setSelectedFileId(null);
-    setSelectedFileName(null);
+    setIsNewArticle(false);
+    setSelectedArticleId(null);
+    setSelectedArticleTitle(null);
   };
 
   return (
     // <WalletProvider>
-      <div className={styles.container}>
+    <div className={styles.container}>
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
@@ -57,12 +61,8 @@ function App() {
                 </svg>
               </div>
               <div className={styles.logoText}>
-                <h1 className={styles.logoTitle}>
-                  WikiTusks
-                </h1>
-                <p className={styles.logoSubtitle}>
-                  Powered by Walrus
-                </p>
+                <h1 className={styles.logoTitle}>WikiTusks</h1>
+                <p className={styles.logoSubtitle}>Powered by Walrus</p>
               </div>
             </div>
             {/* <div className={styles.headerActions}>
@@ -76,17 +76,17 @@ function App() {
       <main className={styles.main}>
         <div className={styles.editorLayout}>
           <div className={styles.sidebar}>
-            <FileList 
-              onFileSelect={handleFileSelect}
+            <ArticleList
+              onFileSelect={handleArticleSelect}
               onAddArticle={handleAddArticle}
-              selectedFileId={selectedFileId}
+              selectedFileId={selectedArticleId}
             />
           </div>
           <div className={styles.editorPane}>
             <MarkdownEditor
-              fileId={selectedFileId}
-              fileName={selectedFileName}
-              isNewFile={isNewFile}
+              fileId={selectedArticleId}
+              fileName={selectedArticleTitle}
+              isNewFile={isNewArticle}
               onSave={handleSave}
               onCancel={handleCancel}
             />
@@ -97,21 +97,10 @@ function App() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <p>
-            Markdown editor built with ❤️ for the decentralized web. Powered by{' '}
-            <a
-              href="https://tusky.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.footerLink}
-            >
-              Tusky
-            </a>
-            .
-          </p>
+          <p>Built with ❤️ using React, TypeScript, and Walrus</p>
         </div>
       </footer>
-      </div>
+    </div>
     // </WalletProvider>
   );
 }

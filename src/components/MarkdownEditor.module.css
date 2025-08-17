@@ -198,7 +198,8 @@
   background: #f3f4f6;
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas, 'DejaVu Sans Mono', monospace;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas,
+    'DejaVu Sans Mono', monospace;
   font-size: 0.875em;
 }
 

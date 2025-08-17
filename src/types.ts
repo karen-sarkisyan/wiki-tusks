@@ -18,3 +18,28 @@ export interface FileInfo {
   type: string;
   lastModified: number;
 }
+
+export interface Article {
+  id: string; // This is the Walrus blob ID
+  title: string;
+  createdDate: string; // ISO 8601 date string
+}
+
+export interface ArticleDatabase {
+  articles: Article[];
+}
+
+export interface JSONBinResponse<T> {
+  record: T;
+  metadata: {
+    id: string;
+    private: boolean;
+    createdAt: string;
+    collectionId?: string;
+  };
+}
+
+export interface JSONBinError {
+  message: string;
+  success: boolean;
+}
