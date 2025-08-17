@@ -297,23 +297,21 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               quotePlugin(),
               thematicBreakPlugin(),
               markdownShortcutPlugin(),
-              ...(isEditing
-                ? [
-                    toolbarPlugin({
-                      toolbarContents: () => (
-                        <>
-                          <UndoRedo />
-                          <BlockTypeSelect />
-                          <BoldItalicUnderlineToggles />
-                          <CodeToggle />
-                          <CreateLink />
-                          <ListsToggle />
-                          <InsertThematicBreak />
-                        </>
-                      ),
-                    }),
-                  ]
-                : []),
+              toolbarPlugin({
+                toolbarClassName: styles.toolbar,
+                toolbarContents: () =>
+                  isEditing ? (
+                    <>
+                      <UndoRedo />
+                      <BlockTypeSelect />
+                      <BoldItalicUnderlineToggles />
+                      <CodeToggle />
+                      <CreateLink />
+                      <ListsToggle />
+                      <InsertThematicBreak />
+                    </>
+                  ) : null,
+              }),
             ]}
             className={styles.editor}
           />
