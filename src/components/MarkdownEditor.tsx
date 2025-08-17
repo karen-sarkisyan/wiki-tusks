@@ -159,7 +159,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           </svg>
           <h3 className={styles.placeholderTitle}>Reading or writing today?</h3>
           <p className={styles.placeholderText}>
-            Choose an article from the left panel or create a new article
+            Choose an article from the left panel or create a new article.
           </p>
           <p className={styles.placeholderText}>We'll take care of the rest.</p>
         </div>
