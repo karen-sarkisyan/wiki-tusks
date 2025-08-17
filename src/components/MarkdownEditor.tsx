@@ -310,6 +310,41 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           />
         </div>
       </div>
+
+      {/* External Links Section */}
+      {!isNewFile && fileId && (
+        <div className={styles.externalLinks}>
+          <div className={styles.externalLinksContent}>
+            <a
+              href={`https://walruscan.com/testnet/blob/${fileId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.externalLink}
+            >
+              <svg
+                className={styles.externalLinkIcon}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              View on Walrus Explorer
+            </a>
+            <div className={styles.blobInfo}>
+              <span className={styles.blobLabel}>Article blob ID:</span>
+              <code className={styles.blobId}>{fileId}</code>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
