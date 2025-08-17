@@ -12,8 +12,7 @@
     var(--newspaper-cream) 0%,
     var(--newspaper-bg) 100%
   );
-  border-bottom: 3px double var(--newspaper-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--newspaper-border);
   position: relative;
 }
 
@@ -100,10 +99,7 @@
 .editorLayout {
   display: flex;
   height: calc(100vh - 120px); /* Account for header and footer */
-  max-width: 1400px;
-  margin: 0 auto;
   background: white;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
   border-left: 1px solid var(--newspaper-border);
   border-right: 1px solid var(--newspaper-border);
 }
@@ -128,12 +124,6 @@
   right: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(
-    180deg,
-    var(--newspaper-border) 0%,
-    transparent 50%,
-    var(--newspaper-border) 100%
-  );
   opacity: 0.3;
 }
 
@@ -263,10 +253,6 @@
     padding: 0 1.5rem;
   }
 
-  .main {
-    padding: 3rem 1.5rem;
-  }
-
   .heroTitle {
     font-size: 3rem;
   }
@@ -279,10 +265,6 @@
 @media (min-width: 1024px) {
   .headerContent {
     padding: 0 2rem;
-  }
-
-  .main {
-    padding: 3rem 2rem;
   }
 }
 
@@ -312,7 +294,7 @@
     var(--newspaper-cream) 0%,
     var(--gray-100) 100%
   );
-  border-top: 3px double var(--newspaper-border);
+  border-top: 3px solid var(--newspaper-border);
   position: relative;
   margin-top: auto;
 }
