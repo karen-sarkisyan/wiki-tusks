@@ -155,7 +155,7 @@
 
 .editorWrapper {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .editor {
@@ -409,6 +409,7 @@
   background: var(--primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  color: white;
 }
 
 .externalLinkIcon {
